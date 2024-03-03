@@ -7,7 +7,6 @@ import { useNavigate } from "react-router-dom";
 import { io } from 'socket.io-client';
 
 
-
 const ChatComponent = () => {
 
   const socket = useMemo(() => io('http://localhost:5000'), []);
@@ -15,30 +14,15 @@ const ChatComponent = () => {
   const [usersList, setusersList] = useState([]);
   const [currentUser, setcurrentUser] = useState({});
   const [touser, settouser] = useState("");
-  const [chatMessages, setChatMessages] = useState([
-    { text: 'Hello!', sender: 'user' },
-    { text: 'Hi there!', sender: 'other' },
-    { text: 'How are you?', sender: 'user' },
-    { text: 'I\'m good, thanks!', sender: 'other' },
-  ]);
+  const [chatMessages, setChatMessages] = useState([]);
   const [message, setMessage] = useState('');
 
-
   useEffect(() => {
-    // socket event for private messages
-    socket.on('private-message', ({ sender, message }) => {
-      console.log(message);
-      setChatMessages((previous) => [
-        ...previous, { text: message, sender }
-      ]);
-    });
+    socket.emit('user connected', currentUser);
+    socket.on('personal-chat', ({ sender, message, to }) => {
+      setChatMessages((pre) => [...pre, { sender, text: message, to }]);
+    })
 
-socket.on('check',(v)=>{
-console.log('dsad');
-  // setChatMessages((previous) => [
-  //   ...previous, { text: message, sender }
-  // ]);
-})
 
 
     let LoginUser = document.cookie
@@ -54,8 +38,6 @@ console.log('dsad');
     };
     fetchusers();
 
-    socket.emit('user connected', currentUser);
-
     return () => {
       socket.disconnect();
     };
@@ -63,13 +45,17 @@ console.log('dsad');
   }, [socket]);
 
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (touser) {
-      setChatMessages((pre) => [...pre, { text: message, sender: 'user' }]);
+      console.log(touser);
       let to = touser.userName;
       let sender = currentUser.userName;
-      socket.emit('private-message', { message, sender, to })
-      setMessage('');
+      let res = await axios.post('/api/message', { message, sender, to });
+      if (res.data.message === 'done') {
+        setChatMessages([...chatMessages, { text: message, sender, to }]);
+        socket.emit('personal-chat', { message, sender, to });
+        setMessage('');
+      }
     }
   }
 
@@ -82,8 +68,11 @@ console.log('dsad');
     console.log(res.data);
   };
 
-  const handleSelectUser = (v) => {
+  const handleSelectUser = async (v) => {
     settouser(v);
+    let res = await axios.get(`/api/message/${v.userName}`, { withCredentials: true });
+    console.log(res.data);
+    setChatMessages(res.data);
   };
 
   return (
@@ -149,12 +138,18 @@ console.log('dsad');
             <h2>Select User To Chat</h2>
           </div>
         )}
-        <div className="overflow-y-auto h-4/5">
+        <div className="overflow-y-auto h-4/5"
+          style={{
+            maxHeight: "80vh",
+            position: "relative",
+            WebkitOverflowScrolling: "touch", // Enables smooth scrolling on Webkit browsers
+            scrollbarWidth: "thin", // For Firefox
+            scrollbarColor: "#2c3e50 #9cc100", // For Firefox
+          }}>
           {chatMessages.map((chat, index) => (
-            <div key={index} className={`flex ${chat.sender === 'user' ? 'justify-end' : 'justify-start'} mb-2`}>
-              <div className={`bg-${chat.sender === 'user' ? 'lime-900' : 'lime-300 text-lime-900'} text-white p-2 rounded-tl-xl rounded-bl-xl rounded-br-xl max-w-xs`}>
+            <div div key={index} className={`flex ${chat.sender === currentUser.userName ? 'justify-end' : 'justify-start'} mb-2`}>
+              <div className={`bg-${chat.sender === currentUser.userName ? 'lime-700 text-white' : 'lime-300 text-lime-900'}  p-2 rounded-tl-xl font-medium rounded-bl-xl rounded-br-xl max-w-xs`}>
                 <div className="flex justify-between">
-                  <span className="text-sm font-bold">{chat.sender === 'user' ? 'You' : chat.sender}</span>
                   <span className="text-xs text-gray-400">{/* Add timestamp here */}</span>
                 </div>
                 <p className="text-sm">{chat.text}</p>
@@ -178,7 +173,7 @@ console.log('dsad');
           </button>
         </div>
       </div>
-    </div>
+    </div >
   );
 };
 

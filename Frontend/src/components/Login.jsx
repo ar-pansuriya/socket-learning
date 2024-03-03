@@ -22,7 +22,7 @@ const Login = () => {
       let res = await axios.post('api/auth/login', data);
       setData({ userName: '', password: '' });
       if (res.data.message === 'login successful') {
-      Navigate('/profile', { replace: true });
+        Navigate('/profile', { replace: true });
       }
     }
   };

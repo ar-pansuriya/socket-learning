@@ -4,8 +4,43 @@
 
 
 
-*{
+* {
   margin: 0px;
   padding: 0px;
   box-sizing: border-box;
+}
+
+
+
+
+/* For Firefox */
+* {
+  scrollbar-color: #2c3e50 #000000;
+}
+
+/* For Webkit Browsers (Chrome, Safari) */
+/* You might need to use JavaScript-based solutions for Webkit browsers */
+/* This example uses a simple overlay scrollbars library */
+/* Include the library in your project for this to work */
+body {
+  overflow: overlay;
+  scrollbar-width: thin;
+}
+
+/* Add your custom styles for the overlay scrollbar here */
+body::-webkit-scrollbar {
+  width: 6px;
+}
+
+body::-webkit-scrollbar-track {
+  background: #2c3e50;
+}
+
+body::-webkit-scrollbar-thumb {
+  background-color: #000000;
+  border-radius: 6px;
+}
+
+body::-webkit-scrollbar-thumb:hover {
+  background-color: #333333;
 }

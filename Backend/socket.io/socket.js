@@ -18,17 +18,21 @@ const users = {}
 io.on('connection', (socket) => {
 
     socket.on('user connected', (newLoginUser) => {
+        let { userName } = newLoginUser
+        users[userName] = socket.id;
         console.log(socket.id);
-        users[newLoginUser] = socket.id;
     });
 
     // Private message event
-    socket.on('private-message', ({ message, to, sender }) => {
+    socket.on('personal-chat', ({ message, to, sender }) => {
         let targetSocketId = users[to];
         console.log(message);
-        if (targetSocketId) {
-            io.to(targetSocketId).emit('check', { sender, message });
-        }
+        console.log(to);
+        console.log(sender);
+        console.log(targetSocketId);
+        // if (targetSocketId) {
+        io.to(targetSocketId).emit('personal-chat', { sender, message, to });
+        // }
     });
 });
 
