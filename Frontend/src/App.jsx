@@ -4,7 +4,6 @@ import Signup from './components/Signup'
 import Login from './components/Login'
 import ChatComponent from './components/ChatComponent';
 import AuthMiddle from './hooks/AuthMiddle';
-import Home from './components/Home';
 
 
 

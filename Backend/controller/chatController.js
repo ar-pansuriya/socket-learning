@@ -13,8 +13,8 @@ module.exports.userList = async (req, res) => {
 },
 
     module.exports.postMessage = async (req, res) => {
-        let { message, sender, to } = req.body;
-        await MessageAdd.insertMany({ text: message, sender, to });
+        let { message, sender, to,createdAt } = req.body;
+        await MessageAdd.insertMany({ text: message, sender, to,createdAt });
         res.send({ message: "done" });
     };
 

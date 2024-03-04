@@ -4,43 +4,28 @@
 
 
 
+/* Add this CSS to style the default scrollbar for Firefox */
 * {
-  margin: 0px;
-  padding: 0px;
-  box-sizing: border-box;
+  scrollbar-color: #2c3e50 #9cc100; /* Dark color and medium dark lime color */
 }
 
 
 
-
-/* For Firefox */
-* {
-  scrollbar-color: #2c3e50 #000000;
+/* Add this CSS to style the default scrollbar for all elements */
+::-webkit-scrollbar {
+  width: 8px; /* Width of the scrollbar */
 }
 
-/* For Webkit Browsers (Chrome, Safari) */
-/* You might need to use JavaScript-based solutions for Webkit browsers */
-/* This example uses a simple overlay scrollbars library */
-/* Include the library in your project for this to work */
-body {
-  overflow: overlay;
-  scrollbar-width: thin;
+::-webkit-scrollbar-track {
+  background-color: transparent; /* Dark color for the track */
+  border-radius: 4px; /* Border radius for the thumb */
 }
 
-/* Add your custom styles for the overlay scrollbar here */
-body::-webkit-scrollbar {
-  width: 6px;
+::-webkit-scrollbar-thumb {
+  background-color: #9cc100; /* Medium dark lime color for the thumb */
+  border-radius: 4px; /* Border radius for the thumb */
 }
 
-body::-webkit-scrollbar-track {
-  background: #2c3e50;
-}
-
-body::-webkit-scrollbar-thumb {
-  background-color: #000000;
-  border-radius: 6px;
-}
-
-body::-webkit-scrollbar-thumb:hover {
-  background-color: #333333;
+::-webkit-scrollbar-thumb:hover {
+  background-color: #7f9900; /* Darker lime color on hover */
 }
