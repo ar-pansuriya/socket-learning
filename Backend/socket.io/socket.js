@@ -8,18 +8,18 @@ const app = express()
 const server = createServer(app)
 const io = new Server(server, {
     cors: {
-        origin: 'http://localhost:3000'
+        origin: 'http://localhost:3000'//set frontend server url over here to get requests and responses
     }
 })
 
 
 const users = {}
-
+// implement or setup io connection for first time 
 io.on('connection', (socket) => {
-
+//get event from front end when uesr is connected
     socket.on('user connected', (newLoginUser) => {
-        let { userName } = newLoginUser
-        users[userName] = socket.id;
+        users[newLoginUser] = socket.id;
+        console.log(newLoginUser);
         console.log(socket.id);
     });
 

@@ -17,18 +17,22 @@ const ChatComponent = () => {
   const [chatMessages, setChatMessages] = useState([]);
   const [message, setMessage] = useState('');
 
+
   useEffect(() => {
-    socket.emit('user connected', currentUser);
-    socket.on('personal-chat', ({ sender, message, to }) => {
-      setChatMessages((pre) => [...pre, { sender, text: message, to }]);
-    })
 
-
-
-    let LoginUser = document.cookie
+    //get login user's usernaem from cookies
+    var LoginUser = document.cookie
       .split("; ")
       .find((row) => row.startsWith("LoginUser="));
     LoginUser = LoginUser.split("=")[1];
+
+
+    // send event to socket user is connected
+    socket.emit('user connected', LoginUser);
+    // get event from socket for message received
+    socket.on('personal-chat', ({ sender, message, to }) => {
+      setChatMessages((pre) => [...pre, { sender, text: message, to }]);
+    });
     // fetch users and set current loginuser
     const fetchusers = async () => {
       let res = await axios.get("/api/userslist");
@@ -37,17 +41,15 @@ const ChatComponent = () => {
       setcurrentUser(res.data.filter((v) => v.userName === LoginUser)[0]);
     };
     fetchusers();
-
+//to cleanup function in useEffect hook
     return () => {
       socket.disconnect();
     };
-
   }, [socket]);
 
-
+// send message functionality 
   const handleSendMessage = async () => {
-    if (touser) {
-      console.log(touser);
+    if (touser.userName && message) {
       let to = touser.userName;
       let sender = currentUser.userName;
       let res = await axios.post('/api/message', { message, sender, to });
@@ -59,13 +61,12 @@ const ChatComponent = () => {
     }
   }
 
-
+//logout account and send api request to remove access and refhresh token form cookies
   const handleLogout = async () => {
     let res = await axios.get("/api/auth/logout");
     if (res.data.message === "success") {
       navigate("/login", { replace: true });
     }
-    console.log(res.data);
   };
 
   const handleSelectUser = async (v) => {
@@ -106,7 +107,9 @@ const ChatComponent = () => {
                   alt="User 1 Profile"
                   className="w-10 h-10 rounded mr-2"
                 />
-                <span className="text-lg font-medium">{v.userName}</span>
+                <div className="flex flex-col">
+                  <span className="text-lg font-medium">{v.userName}</span>
+                </div>
               </div>
             ))}
             {/* Add more users as needed */}
@@ -138,10 +141,11 @@ const ChatComponent = () => {
             <h2>Select User To Chat</h2>
           </div>
         )}
-        <div className="overflow-y-auto h-4/5"
+        {touser.userName && (<div className="overflow-y-auto h-4/5"
           style={{
-            maxHeight: "80vh",
             position: "relative",
+            overflowX: 'hidden',
+            textWrap: 'wrap',
             WebkitOverflowScrolling: "touch", // Enables smooth scrolling on Webkit browsers
             scrollbarWidth: "thin", // For Firefox
             scrollbarColor: "#2c3e50 #9cc100", // For Firefox
@@ -157,7 +161,7 @@ const ChatComponent = () => {
             </div>
           ))}
           {/* Add more chat messages as needed */}
-        </div>
+        </div>)}
 
         {/* Input and Send Button */}
         <div className="flex items-center">
