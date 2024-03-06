@@ -3,10 +3,17 @@
 @tailwind utilities;
 
 
+html {
+  scroll-behavior: smooth;
+  transition: scroll-behavior 1s ease-in-out;
+}
+
+
 
 /* Add this CSS to style the default scrollbar for Firefox */
 * {
-  scrollbar-color: #2c3e50 #9cc100; /* Dark color and medium dark lime color */
+  scrollbar-color: #2c3e50 #9cc100; /* Dark color and medium dark lime 
+  color */
 }
 
 

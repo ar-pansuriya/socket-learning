@@ -6,6 +6,11 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { io } from 'socket.io-client';
 import EmojiPicker from 'emoji-picker-react';
+import { useRef } from "react";
+import CreateGroup from "./CreateGroup";
+import { useDispatch, useSelector } from "react-redux";
+import { addCurrentUser, adduserList } from "../redux-slice/ChatSlice";
+import GroupChats from "./GroupChats";
 
 const ChatComponent = () => {
 
@@ -19,8 +24,10 @@ const ChatComponent = () => {
   const [emojiopen, setemojiopen] = useState(false)
   const [istyping, setistyping] = useState(false);
   const [onlineusers, setonlineusers] = useState([]);
-
-
+  const [page, setPage] = useState(1);
+  const chatdiv = useRef();
+  const dispatch = useDispatch();
+const [isgroupselected,setisgroupselected]=useState(false);
   //format date for created message
   const formated = (time) => {
     let timestamp = new Date(time);
@@ -66,9 +73,12 @@ const ChatComponent = () => {
       let adduser = res.data.filter((v) => v.userName !== LoginUser);
       setusersList(adduser);
       setcurrentUser(res.data.filter((v) => v.userName === LoginUser)[0]);
+      dispatch(addCurrentUser(res.data.filter((v) => v.userName === LoginUser)[0]));
+      dispatch(adduserList(adduser));
+      console.log('sdas');
+
     };
     fetchusers();
-
     //get event when user is typing...
     socket.on('typing', ({ istyping }) => {
       setistyping(istyping);
@@ -79,7 +89,7 @@ const ChatComponent = () => {
     return () => {
       socket.disconnect();
     };
-  }, [socket]);
+  }, [socket,dispatch]);
 
   // send message functionality 
   const handleSendMessage = async () => {
@@ -106,19 +116,73 @@ const ChatComponent = () => {
       navigate("/login", { replace: true });
     }
   };
+
+
   // select uesr to send message functionality
   const handleSelectUser = async (v) => {
+    setisgroupselected(false);
+    if (touser.userName !== v.userName) {
+      setPage(1);
+    } else {
+      return
+    }
     settouser(v);
-    let res = await axios.get(`/api/message/${v.userName}`, { withCredentials: true });
-    console.log(res.data);
-    setChatMessages(res.data);
+    fetchChats(v);
   };
+
+  async function fetchChats(v = "") {
+    let res = await axios.get(`/api/message?user=${touser.userName}&page=${page}`, { withCredentials: true });
+    if (touser.userName === v.userName) {
+      return setChatMessages(res.data);
+    }
+    setChatMessages(res.data);
+  }
 
   // set selected emoji to input value
   const handleEmoji = (v) => {
     console.log(v);
     setMessage((pre) => pre += v)
   }
+
+  //infinite scrolling features for chats
+
+  const handleScroll = async (e) => {
+    const { scrollHeight, clientHeight, scrollTop } = e.target;
+    console.log(scrollHeight, clientHeight, scrollTop);
+    console.log(page);
+    console.log(chatMessages);
+
+    let targetScrollPosition = null;
+
+    // Check if user scrolled to the bottom
+    if (Math.ceil(scrollHeight - scrollTop) === clientHeight + 1) {
+      if ([15, 18].includes(chatMessages.length)) {
+        console.log('asas');
+        setPage((prevPage) => prevPage + 1);
+        targetScrollPosition = scrollHeight - clientHeight; // Scroll to the bottom
+      }
+    }
+
+    // Check if user scrolled to the top
+    if (scrollTop === 0) {
+      setPage((p) => Math.max(1, p - 1));
+      targetScrollPosition = 20; // Scroll to the top
+    }
+
+    // Set the scroll position if a target position is defined
+    if (targetScrollPosition !== null) {
+      chatdiv.current.scrollTop = targetScrollPosition;
+    }
+  };
+
+  useEffect(() => {
+    fetchChats()
+  }, [touser, page]);
+
+const isGslected = (v)=>{
+setisgroupselected(v);
+}
+
 
 
   return (
@@ -130,7 +194,7 @@ const ChatComponent = () => {
         }}
       >
         {/* Left Div */}
-        <div className="flex-col flex justify-between w-1/4 border shadow-lg bg-lime-900 rounded p-4">
+        <div className="flex-col flex justify-between w-72 border shadow-lg bg-lime-900 rounded p-4">
           <div>
             <div className="text-lg bg-lime-300 flex items-center p-2 rounded font-semibold mb-4">
               <img
@@ -140,7 +204,9 @@ const ChatComponent = () => {
               />
               <span className="text-lg font-medium">{currentUser.userName}</span>
             </div>
-            {/* Sample user list */}
+            {/* create group component here */}
+            <CreateGroup isGslected = {isGslected}/>
+            {/* all users list here */}
             <ul className="flex flex-col gap-2 scroll-auto">
               {usersList.map((v, index) => (
                 <div
@@ -173,9 +239,10 @@ const ChatComponent = () => {
         </div>
 
         {/* Right Div */}
-        <div className="flex-grow flex flex-col justify-between rounded bg-lime-100 p-4">
+        {isgroupselected?<GroupChats/>:
+        (<div className="flex-grow flex flex-col justify-between rounded bg-lime-100 p-4">
           {touser ? (
-            <div className="text-lg bg-lime-900 text-white flex items-center p-2 rounded font-semibold mb-4">
+            <div className="text-lg bg-lime-900 text-white flex items-center p-2 rounded font-semibold mb-2">
               <img
                 src={touser.profilePic} // Replace with the actual path to your image
                 alt="User 1 Profile"
@@ -198,7 +265,8 @@ const ChatComponent = () => {
               textWrap: 'wrap',
               padding: '1rem',
 
-            }}>
+            }}
+            onScroll={handleScroll} ref={chatdiv}>
             {chatMessages.map((chat, index) => (
               <div key={index} className={`flex ${chat.sender === currentUser.userName ? 'justify-end' : 'justify-start'} mb-2`}>
                 <div className={`bg-${chat.sender === currentUser.userName ? 'lime-700 text-white' : 'lime-500 text-lime-900'}  p-2 rounded-tl-xl font-medium rounded-bl-xl rounded-br-xl max-w-xs`} >
@@ -246,7 +314,7 @@ const ChatComponent = () => {
               Send
             </button>
           </div>
-        </div>
+        </div>)}
       </div >
     </>
   );

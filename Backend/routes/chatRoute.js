@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.get('/userslist', userList);
 router.post('/message', postMessage);
-router.get('/message/:to', getMessage);
+router.get('/message', getMessage);
 
 
 
