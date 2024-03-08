@@ -17,5 +17,9 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^7.6.3",
     "socket.io": "^4.7.4"
+  },
+  "optionalDependencies": {
+    "bufferutil": "^4.0.8",
+    "utf-8-validate": "^5.0.10"
   }
 }

@@ -1,33 +1,76 @@
-import React, { useState } from 'react'
-import { useSelector } from 'react-redux'
+import React, { useEffect, useMemo, useState } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import EmojiPicker from 'emoji-picker-react';
+import axios from 'axios';
+import { io } from 'socket.io-client';
+import { addgroupData } from '../redux-slice/ChatSlice';
 
 
 export default function GroupChats() {
 
+
+  const socket = useMemo(() => io('http://localhost:5000'), []);
   const selectedGroup = useSelector(state => state.Chats.selectGdata);
   const currentUser = useSelector(state => state.Chats.currentUser);
-  const [chatMessages, setChatMessages] = useState([
-    { text: "hey", to: 'asd1212', sender: 'xyz1212' },
-    { text: "how are you", to: 'asd1212', sender: 'qwe1212' },
-  ]);
+  const [chatMessages, setChatMessages] = useState([]);
   const [emojiopen, setemojiopen] = useState(false);
   const [message, setMessage] = useState('');
+  const currentG = useSelector(state => state.Chats.curretnG);
+  const GroupMessage = useSelector(state => state.Chats.groupData)
+  const dispatch = useDispatch();
+  const oneGmessage = useSelector(state => state.Chats.oneGMessage);
 
 
+  useEffect(() => {
+    setChatMessages(GroupMessage)
+    return () => {
+      setChatMessages([]);
+    };
+  }, [GroupMessage])
 
+  useEffect(() => {
+    if (oneGmessage) {
+      setChatMessages((pre) => [...pre, oneGmessage])
+    }
+  }, [oneGmessage]);
 
 
   // set selected emoji to input value
   const handleEmoji = (v) => {
-    console.log(v);
     setMessage((pre) => pre += v)
   }
-
   //handle group messages
-  const handleGroupMessage = () => {
+  const handleGroupMessage = async () => {
+    if (selectedGroup.name && message) {
+      let sender = currentUser.userName;
+      let Id = selectedGroup._id;
+      let res = await axios.post('/api/group/message', { message, sender, Id });
+      if (res.data.message === 'done') {
+        socket.emit('sendGroupMessage', { text: message, Gdata: res.data.group, sender: { userName: currentUser.userName } });
+        // setChatMessages([...chatMessages, { text: message, sender: { userName: currentUser.userName }, groupId: selectedGroup._id }]);
+        setMessage('');
+      }
+    }
+  };
 
+  const fetchGroupMessages = async () => {
+    let res = await axios.get(`/api/group/message/${selectedGroup._id}`);
+    dispatch(addgroupData(res.data));
+    // return setChatMessages(res.data);
   }
+
+  useEffect(() => {
+    if (selectedGroup) {
+      fetchGroupMessages();
+    }
+
+    // Cleanup chat messages when a new group is selected
+    return () => {
+      setChatMessages([]);
+    };
+  }, [selectedGroup]);
+
+
 
 
 
@@ -58,16 +101,21 @@ export default function GroupChats() {
             textWrap: 'wrap',
             padding: '1rem',
           }}>
-          {chatMessages.map((chat, index) => (
-            <div key={index} className={`flex ${chat.sender === currentUser.userName ? 'justify-end' : 'justify-start'} mb-2`}>
-              <div className={`bg-${chat.sender === currentUser.userName ? 'lime-700 text-white' : 'lime-500 text-lime-900'}  p-2 rounded-tl-xl font-medium rounded-bl-xl rounded-br-xl max-w-xs`} >
-                <div className="flex justify-between">
-                  <span className="text-xs text-lime-100">{chat.sender === currentUser.userName ? "you" : chat.sender}</span>
+          {chatMessages.map((chat, index) => {
+            if (selectedGroup._id === chat.groupId) {
+              return (
+                <div key={index} className={`flex ${chat.sender.userName === currentUser.userName ? 'justify-end' : 'justify-start'} mb-2`}>
+                  <div className={`bg-${chat.sender.userName === currentUser.userName ? 'lime-700 text-white' : 'lime-500 text-lime-900'}  p-2 rounded-tl-xl font-medium rounded-bl-xl rounded-br-xl max-w-xs`} >
+                    <div className="flex justify-between">
+                      <span className="text-xs text-lime-100">{chat.sender.userName === currentUser.userName ? "you" : chat.sender.userName}</span>
+                    </div>
+                    <p className="text-md">{chat.text}</p>
+                  </div>
                 </div>
-                <p className="text-md">{chat.text}</p>
-              </div>
-            </div>
-          ))}
+              );
+            }
+          })}
+
           {/* Add more chat messages as needed */}
         </div>)}
 
