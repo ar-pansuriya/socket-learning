@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import HorizontalScrollContainer from '../hooks/HorizontalScrollContainer';
 import { toast } from 'react-toastify';
 import axios from 'axios';
-import { addcurretnG, addselectGdata,addOneGmessage } from '../redux-slice/ChatSlice';
+import { addcurretnG, addselectGdata, addOneGmessage } from '../redux-slice/ChatSlice';
 import { io } from 'socket.io-client';
 
 export default function CreateGroup({ isGslected }) {
@@ -24,8 +24,13 @@ export default function CreateGroup({ isGslected }) {
         socket.on('groupCreated', ({ groupName }) => {
             toast.success(`Group created with name ${groupName}`);
         })
-        socket.on('groupError', (v) => {
-            toast.error(v);
+        socket.on('groupError', async ({ groupId }) => {
+            toast.error('Sorry he or she is no more')
+            toast.warn('please refresh the page')
+          let res  = await axios.delete(`/api/group/${groupId}`);
+          if(res.data.message==='done'){
+            getGroups();
+          }
         })
 
     }, [socket]);
@@ -72,16 +77,18 @@ export default function CreateGroup({ isGslected }) {
         dispatch(addcurretnG(group._id));
     };
 
+    const getGroups = async () => {
+        try {
+            const res = await axios.get('/api/group');
+            setGroups(res.data);
+            setIsRender(false);
+        } catch (error) {
+            console.error('Error fetching groups:', error.message);
+        }
+    };
+
     useEffect(() => {
-        const getGroups = async () => {
-            try {
-                const res = await axios.get('/api/group');
-                setGroups(res.data);
-                setIsRender(false);
-            } catch (error) {
-                console.error('Error fetching groups:', error.message);
-            }
-        };
+       
 
         if (isRender) {
             getGroups();
@@ -159,7 +166,7 @@ export default function CreateGroup({ isGslected }) {
                                         alt="Group"
                                         className="w-12 h-12 border border-lime-900 rounded-full"
                                     />
-                                    <span className="text-white font-semibold">{group.name}</span>
+                                    <span className="text-white text-sm font-semibold">{group.name}</span>
                                 </div>
                             );
                         } else {

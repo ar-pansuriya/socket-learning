@@ -11,7 +11,8 @@ const server = createServer(app);
 // Create a Socket.IO server instance attached to the HTTP server
 const io = new Server(server, {
     cors: {
-        origin: 'http://localhost:3000' // Set frontend server URL to handle requests and responses
+        origin: 'http://localhost:3000', // Set frontend server URL to handle requests and responses
+        methods:['GET',"POST","DELETE"]
     }
 });
 
@@ -78,7 +79,7 @@ io.on('connection', (socket) => {
             socket.join(group.name);
         } else {
             // Notify the user that the group doesn't exist
-            io.to(socket.id).emit('groupError', 'Group does not exist');
+            io.to(socket.id).emit('groupError', {groupId:group._id});
         }
     });
 
