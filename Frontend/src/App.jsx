@@ -13,13 +13,14 @@ function App() {
 
   return (
     <>
-    <Routes>
-      <Route path='/login' element={<Login></Login>}></Route>
-      <Route path='/signup' element={<Signup></Signup>}></Route>
-      <Route element={<AuthMiddle/>}>
-      <Route path='/profile' element={<ChatComponent/>}></Route>
-      </Route>
-    </Routes>
+      <Routes>
+        <Route path='/login' element={<Login></Login>}></Route>
+        <Route path='/' element={<Login></Login>}></Route>
+        <Route path='/signup' element={<Signup></Signup>}></Route>
+        <Route element={<AuthMiddle />}>
+          <Route path='/profile' element={<ChatComponent />}></Route>
+        </Route>
+      </Routes>
     </>
   )
 }

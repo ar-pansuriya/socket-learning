@@ -4,7 +4,8 @@ import EmojiPicker from 'emoji-picker-react';
 import axios from 'axios';
 import { io } from 'socket.io-client';
 import { addgroupData } from '../redux-slice/ChatSlice';
-
+import HorizontalScrollContainer from '../hooks/HorizontalScrollContainer'
+import ShowMember from './ShowMember';
 
 export default function GroupChats() {
 
@@ -19,7 +20,7 @@ export default function GroupChats() {
   const GroupMessage = useSelector(state => state.Chats.groupData)
   const dispatch = useDispatch();
   const oneGmessage = useSelector(state => state.Chats.oneGMessage);
-
+  const [showMember, setShowMember] = useState(false);
 
   useEffect(() => {
     setChatMessages(GroupMessage)
@@ -70,27 +71,22 @@ export default function GroupChats() {
     };
   }, [selectedGroup]);
 
-
-
-
-
   return (
     <>
-      <div className="flex-grow flex flex-col justify-between rounded bg-lime-100 p-4">
+      <div className="flex-grow flex flex-col justify-between rounded bg-sky-50 max-sm:p-2 p-4">
         {selectedGroup && (
-          <div className="text-lg gap-2 bg-lime-900 text-white flex items-center p-2 rounded font-semibold mb-2">
-            <img
-              src={selectedGroup.profilePic} // Replace with the actual path to your image
-              alt="User 1 Profile"
-              className="w-10 h-10 rounded mr-2"
-            />
+          <div className="text-lg gap-2 relative shadow-sm bg-sky-900 text-white flex items-center p-2 rounded font-semibold mb-2">
+            <h1 className="w-10 h-10 bg-sky-100 shadow-lg text-lg flex items-center justify-center text-sky-700 rounded"
+            >{selectedGroup.profilePic}</h1>
             <div className='flex items-center w-full justify-between'>
               <div className="flex flex-col">
-                <span className="text-lg font-medium">{selectedGroup.name}</span>
+                <span className="text-lg max-sm:text-sm font-medium">{selectedGroup.name}</span>
                 <span className="text-xs font-medium">created by {selectedGroup.owner.userName}</span>
               </div>
-              <span className="text-sm mr-2 bg-lime-100 text-lime-900 p-2 rounded text-center font-medium">Members : {selectedGroup.member.length}</span>
+              <span className="text-sm mr-2 bg-sky-100 text-sky-900 p-2 rounded text-center font-medium cursor-pointer" onClick={() => setShowMember(!showMember)}>Members : {selectedGroup.member.length}</span>
             </div>
+            {showMember && <ShowMember />}
+
           </div>
         )}
 
@@ -105,9 +101,9 @@ export default function GroupChats() {
             if (selectedGroup._id === chat.groupId) {
               return (
                 <div key={index} className={`flex ${chat.sender.userName === currentUser.userName ? 'justify-end' : 'justify-start'} mb-2`}>
-                  <div className={`bg-${chat.sender.userName === currentUser.userName ? 'lime-700 text-white' : 'lime-500 text-lime-900'}  p-2 rounded-tl-xl font-medium rounded-bl-xl rounded-br-xl max-w-xs`} >
+                  <div className={`bg-${chat.sender.userName === currentUser.userName ? 'sky-700 text-white' : 'sky-500 text-sky-900'}  p-2 rounded-tl-xl font-medium rounded-bl-xl rounded-br-xl max-w-xs`} >
                     <div className="flex justify-between">
-                      <span className="text-xs text-lime-100">{chat.sender.userName === currentUser.userName ? "you" : chat.sender.userName}</span>
+                      <span className="text-xs text-sky-100">{chat.sender.userName === currentUser.userName ? "you" : chat.sender.userName}</span>
                     </div>
                     <p className="text-md">{chat.text}</p>
                   </div>
@@ -120,14 +116,14 @@ export default function GroupChats() {
         </div>)}
 
         {/* Input and Send Button */}
-        <div className="flex items-end gap-2">
+        <div className="flex items-center gap-2">
           <div className="flex flex-col" style={{ position: 'relative' }}>
-            {emojiopen && <EmojiPicker style={{
+            {emojiopen && <EmojiPicker className='bg-sky-50' style={{
               position: 'absolute',
-              bottom: 50
+              bottom: 60,
             }} open={emojiopen} onEmojiClick={(e) => handleEmoji(e.emoji)} />}
-            <button onClick={() => setemojiopen(emojiopen ? false : true)} className="bg-lime-500 text-white p-2 rounded text-xl w-fit">
-              😊
+            <button onClick={() => setemojiopen(emojiopen ? false : true)} className=" text-white p-2 rounded max-sm:hidden text-xl w-fit">
+              <img className="w-10 h-10" src="wavetalk.png" alt="" />
             </button>
           </div>
           <input
@@ -142,9 +138,9 @@ export default function GroupChats() {
                 handleGroupMessage();
               }
             }}
-            className="flex-grow border focus:outline-none focus:border-lime-700 rounded p-2 mr-2"
+            className="flex-grow border focus:outline-none bg-sky-50 border-sky-900 rounded p-2"
           />
-          <button onClick={handleGroupMessage} className="bg-lime-900 text-white p-2 rounded text-xl">
+          <button onClick={handleGroupMessage} className="bg-sky-900 text-white p-2 rounded text-xl max-sm:text-md">
             Send
           </button>
         </div>

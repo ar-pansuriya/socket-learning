@@ -6,7 +6,7 @@ const initialState = {
     selectGdata: [],
     curretnG: [],
     groupData: [],
-    oneGMessage:'',
+    oneGMessage: '',
 }
 
 const ChatSlice = createSlice({
@@ -14,7 +14,6 @@ const ChatSlice = createSlice({
     initialState,
     reducers: {
         adduserList: (state, action) => {
-            console.log(action.payload);
             state.userlist = action.payload
         },
         addCurrentUser: (state, action) => {
@@ -30,11 +29,11 @@ const ChatSlice = createSlice({
             console.log(action.payload);
             state.groupData = action.payload
         },
-        addOneGmessage:(state,action)=>{
+        addOneGmessage: (state, action) => {
             state.oneGMessage = action.payload
         }
     }
 });
 
-export const { adduserList, addCurrentUser, addselectGdata, addcurretnG, addgroupData,addpreviousGroup,addOneGmessage } = ChatSlice.actions;
+export const { adduserList, addCurrentUser, addselectGdata, addcurretnG, addgroupData, addpreviousGroup, addOneGmessage } = ChatSlice.actions;
 export default ChatSlice.reducer;

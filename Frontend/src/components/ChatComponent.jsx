@@ -11,6 +11,10 @@ import CreateGroup from "./CreateGroup";
 import { useDispatch, useSelector } from "react-redux";
 import { addCurrentUser, adduserList } from "../redux-slice/ChatSlice";
 import GroupChats from "./GroupChats";
+import HorizontalScrollContainer from "../hooks/HorizontalScrollContainer";
+import AnimatedHeader from '../components/AnimatedHeader'
+import '../App.css'
+
 
 const ChatComponent = () => {
 
@@ -28,6 +32,7 @@ const ChatComponent = () => {
   const chatdiv = useRef();
   const dispatch = useDispatch();
   const [isgroupselected, setisgroupselected] = useState(false);
+  const [isLeftbarOpen, setisLeftBarOpen] = useState(false)
   //format date for created message
   const formated = (time) => {
     let timestamp = new Date(time);
@@ -117,22 +122,30 @@ const ChatComponent = () => {
 
   // select uesr to send message functionality
   const handleSelectUser = async (v) => {
-    setisgroupselected(false);
-    if (touser.userName !== v.userName) {
-      setPage(1);
-    } else {
-      return
+    try {
+      // Assuming fetchChats is an asynchronous function, await it
+
+      setisgroupselected(false);
+      // Check if the selected user is different from the current user
+      if (touser.userName !== v.userName) {
+        setPage(1);
+      } else {
+        return;
+      }
+      settouser(v);
+      let data = await fetchChats(v);
+      setChatMessages(data);
+    } catch (error) {
+      console.error("Error fetching chats:", error.message);
+      // Handle error if necessary
     }
-    settouser(v);
-    fetchChats(v);
   };
 
-  async function fetchChats(v = "") {
-    let res = await axios.get(`/api/message?user=${touser.userName}&page=${page}`, { withCredentials: true });
-    if (touser.userName === v.userName) {
-      return setChatMessages(res.data);
-    }
-    setChatMessages(res.data);
+  async function fetchChats(v) {
+    console.log('asasa');
+    let res = await axios.get(`/api/message?user=${v ? v.userName : touser.userName}&page=${page}`, { withCredentials: true });
+    console.log(res.data);
+    return res.data
   }
 
   // set selected emoji to input value
@@ -144,31 +157,13 @@ const ChatComponent = () => {
 
   const handleScroll = async (e) => {
     const { scrollHeight, clientHeight, scrollTop } = e.target;
-    let targetScrollPosition = null;
-
     // Check if user scrolled to the bottom
-    if (Math.ceil(scrollHeight - scrollTop) === clientHeight + 1) {
-      if ([15, 18].includes(chatMessages.length)) {
-        setPage((prevPage) => prevPage + 1);
-        targetScrollPosition = scrollHeight - clientHeight; // Scroll to the bottom
-      }
-    }
-
-    // Check if user scrolled to the top
-    if (scrollTop === 0) {
-      setPage((p) => Math.max(1, p - 1));
-      targetScrollPosition = 20; // Scroll to the top
-    }
-
-    // Set the scroll position if a target position is defined
-    if (targetScrollPosition !== null) {
-      chatdiv.current.scrollTop = targetScrollPosition;
+    if (scrollHeight - scrollTop === clientHeight) {
+      setPage((prevPage) => prevPage + 1);
+      let data = await fetchChats() // Scroll to the bottom
+      setChatMessages((pre) => [...pre, ...data]);
     }
   };
-
-  useEffect(() => {
-    fetchChats()
-  }, [touser, page]);
 
   const isGslected = (v) => {
     setisgroupselected(v);
@@ -179,31 +174,34 @@ const ChatComponent = () => {
   return (
     <>
       <div
-        className="flex"
+        className="flex w-full bg-sky-50 relative text-sky-700"
         style={{
           height: "100vh",
         }}
       >
         {/* Left Div */}
-        <div className="flex-col flex justify-between w-72 border shadow-lg bg-lime-900 rounded p-4">
+        <div style={{ width: `${isLeftbarOpen ? '0' : '288'}px`, visibility: `${isLeftbarOpen ? 'hidden' : 'visible'}` }} className={`flex-col left-0 flex z-10 bg-white shadow-2xl gap-4 border max-sm:absolute max-sm:h-full p-4 overflow-y-auto`}>
+          <div className="flex items-center justify-center gap-2">
+            <img src="wavetalk.png" alt="" className='w-14 h-14 rounded' />
+            <h1 className='text-3xl font-bold text-sky-600'>WaveTalk</h1></div>
           <div>
-            <div className="text-lg bg-lime-300 flex items-center p-2 rounded font-semibold mb-4">
-              <img
+            <div className="text-lg shadow-xl bg-sky-900 text-white flex items-center p-2 rounded font-semibold mb-4">
+              {/* <img
                 src={currentUser.profilePic} // Replace with the actual path to your image
                 alt="User 1 Profile"
-                className="w-10 h-10 rounded mr-2"
-              />
+                className="w-10 h-10 mr-2"
+              /> */}
               <span className="text-lg font-medium">{currentUser.userName}</span>
             </div>
             {/* create group component here */}
             <CreateGroup isGslected={isGslected} />
             {/* all users list here */}
-            <ul className="flex flex-col gap-2 scroll-auto">
+            <HorizontalScrollContainer direction={"col"} height={'h-64'}>
               {usersList.map((v, index) => (
                 <div
                   key={index}
                   onClick={() => handleSelectUser(v)}
-                  className="border-lime-100 border-2 hover:bg-lime-700 text-white flex items-center p-2 cursor-pointer rounded"
+                  className="border-sky-900 border w-full hover:bg-sky-100 text-sky-700 flex items-center p-2 cursor-pointer rounded"
                 >
                   <img
                     src={v.profilePic} // Replace with the actual path to your image
@@ -217,23 +215,28 @@ const ChatComponent = () => {
                 </div>
               ))}
               {/* Add more users as needed */}
-            </ul>
+            </HorizontalScrollContainer>
           </div>
+
           <div>
             <button
               onClick={handleLogout}
-              className="bg-lime-100 p-2 rounded text-xl"
+              className="bg-sky-900 text-white p-2 rounded text-xl"
             >
               Logout
             </button>
           </div>
         </div>
 
+
+        <img onTouchStart={() => setisLeftBarOpen(!isLeftbarOpen)} onClick={() => setisLeftBarOpen(!isLeftbarOpen)} className="w-6 h-6 cursor-pointer hover:w-8 hover:h-8 -right-0 absolute left-0 top-1/2 z-40  my-auto" src="arrow.png" alt=""
+          style={{ transform: `translateX(${isLeftbarOpen ? '0' : '290'}px) translateY(-50%) rotate(${isLeftbarOpen ? '180' : '0'}deg) translateZ(0px)`, transition: '0.5s' }} />
+
         {/* Right Div */}
         {isgroupselected ? <GroupChats /> :
-          (<div className="flex-grow flex flex-col justify-between rounded bg-lime-100 p-4">
-            {touser ? (
-              <div className="text-lg bg-lime-900 text-white flex items-center p-2 rounded font-semibold mb-2">
+          (<div className="flex-grow flex flex-col justify-between rounded bg-sky-50 max-sm:p-2 p-4">
+            {touser && (
+              <div className="text-lg bg-sky-900 text-white flex items-center p-2 rounded font-semibold mb-2">
                 <img
                   src={touser.profilePic} // Replace with the actual path to your image
                   alt="User 1 Profile"
@@ -244,25 +247,20 @@ const ChatComponent = () => {
                   <span className="text-xs">{istyping ? 'typing...' : onlineusers.includes(touser.userName) && 'online'}</span>
                 </div>
               </div>
-            ) : (
-              <div className="text-lg py-3 bg-lime-900 text-white flex items-center p-2 rounded font-semibold">
-                <h2>Select User To Chat</h2>
-              </div>
             )}
-            {touser.userName && (<div className="overflow-y-auto h-4/5"
+            {touser.userName && (<div className="overflow-y-auto"
               style={{
                 position: "relative",
                 overflowX: 'hidden',
                 textWrap: 'wrap',
                 padding: '1rem',
-
               }}
               onScroll={handleScroll} ref={chatdiv}>
               {chatMessages.map((chat, index) => (
-                <div key={index} className={`flex ${chat.sender === currentUser.userName ? 'justify-end' : 'justify-start'} mb-2`}>
-                  <div className={`bg-${chat.sender === currentUser.userName ? 'lime-700 text-white' : 'lime-500 text-lime-900'}  p-2 rounded-tl-xl font-medium rounded-bl-xl rounded-br-xl max-w-xs`} >
+                <div key={index} className={`flex ${chat.sender === currentUser.userName ? 'justify-end' : 'justify-start'} text-wrap mb-4`}>
+                  <div className={`bg-${chat.sender === currentUser.userName ? 'sky-700 text-white' : 'sky-200 text-sky-900'} w-56 shadow-lg p-2 rounded font-medium wave`} >
                     <div className="flex justify-between">
-                      <span className="text-xs text-lime-100">{chat.createdAt}</span>
+                      <span className={`text-xs ${chat.sender === currentUser.userName ? 'text-white' : 'text-sky-700'}`}>{chat.createdAt}</span>
                     </div>
                     <p className="text-md">{chat.text}</p>
                   </div>
@@ -272,14 +270,14 @@ const ChatComponent = () => {
             </div>)}
 
             {/* Input and Send Button */}
-            <div className="flex items-end gap-2">
+            {touser ? <div className="flex items-center pt-4 gap-2">
               <div className="flex flex-col" style={{ position: 'relative' }}>
                 {emojiopen && <EmojiPicker style={{
                   position: 'absolute',
                   bottom: 50
                 }} open={emojiopen} onEmojiClick={(e) => handleEmoji(e.emoji)} />}
-                <button onClick={() => setemojiopen(emojiopen ? false : true)} className="bg-lime-500 text-white p-2 rounded text-xl w-fit">
-                  😊
+                <button onClick={() => setemojiopen(emojiopen ? false : true)} className=" text-white p-2 rounded max-sm:hidden text-xl w-fit">
+                  <img className="w-10 h-10" src="wavetalk.png" alt="" />
                 </button>
               </div>
               <input
@@ -299,12 +297,12 @@ const ChatComponent = () => {
                     handleSendMessage();
                   }
                 }}
-                className="flex-grow border focus:outline-none focus:border-lime-700 rounded p-2 mr-2"
+                className="flex-grow border focus:outline-none bg-sky-50 border-sky-900 rounded p-2"
               />
-              <button onClick={handleSendMessage} className="bg-lime-900 text-white p-2 rounded text-xl">
+              <button onClick={handleSendMessage} className="bg-sky-900 text-white p-2 rounded text-xl max-sm:text-md">
                 Send
               </button>
-            </div>
+            </div> : (<AnimatedHeader />)}
           </div>)}
       </div >
     </>

@@ -20,12 +20,12 @@ module.exports.userList = async (req, res) => {
 
 module.exports.getMessage = async (req, res) => {
     try {
+
         let sender = req.cookies.LoginUser;
         let to = req.query.user;
         let page = req.query.page
-        let limit = 15;
+        let limit = 10;
         let skip = (page - 1) * limit;
-
         // Include the last two messages from the previous page
         if (page > 1) {
             skip = skip - 3; // Adjust the skip value to include the last two messages from the previous page

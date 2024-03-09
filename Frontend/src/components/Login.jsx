@@ -30,32 +30,39 @@ const Login = () => {
 
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen gap-4">
-      <input
-        type="text"
-        name="userName"
-        onChange={handleInputChange}
-        placeholder="User name"
-        value={data.userName}
-        className="border p-2 focus:outline-none focus:border-lime-600 focus:border-2  rounded-md"
-      />
-      <input
-        type="password"
-        name="password"
-        onChange={handleInputChange}
-        placeholder="Password"
-        value={data.password}
-        className="border p-2 focus:outline-none focus:border-lime-600 focus:border-2 rounded-md"
-      />
-      <button onClick={handleClick} className="bg-lime-600 text-white p-2 rounded-md hover:bg-lime-800">
-        Login
-      </button>
-      <Link to="/signup" className="text-lime-900 underline">
-        Create new account???
-      </Link>
-      <Link to="/profile" className="text-lime-900 hover:underline">
-        Go to Chatapp
-      </Link>
+    <div className="h-screen text-center flex flex-col items-center justify-center">
+      <div className="flex items-center justify-center gap-3 flex-col p-8">
+        <img src="wavetalk.png" alt="" className='shadow-xl rounded-full' />
+        <h1 className='text-3xl font-bold text-sky-600'>Welcome to WaveTalk</h1>
+        <input
+          type="text"
+          name="userName"
+          onChange={handleInputChange}
+          placeholder="User name"
+          value={data.userName}
+          className="border p-2 focus:outline-none focus:border-sky-600 focus:border-2 rounded-md text-sky-700"
+        />
+        <input
+          type="password"
+          name="password"
+          onChange={handleInputChange}
+          placeholder="Password"
+          value={data.password}
+          className="border p-2 focus:outline-none focus:border-sky-600 focus:border-2 rounded-md text-sky-700"
+        />
+        <button
+          onClick={handleClick}
+          className="bg-sky-600 text-white p-2 rounded-md hover:bg-sky-800"
+        >
+          Login
+        </button>
+        <Link to="/signup" className="text-sky-900 underline mb-2">
+          Join the WaveTalk Community???
+        </Link>
+        <Link to="/profile" className="text-sky-900 hover:underline">
+          Enter WaveTalk
+        </Link>
+      </div>
     </div>
   );
 };

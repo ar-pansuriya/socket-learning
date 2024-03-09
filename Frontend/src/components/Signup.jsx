@@ -21,14 +21,16 @@ const Signup = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen gap-4">
+    <div className="flex flex-col items-center justify-center text-center h-screen gap-3">
+      <img src="wavetalk.png" alt="" className='shadow-xl rounded-full' />
+      <h1 className='text-3xl font-bold text-sky-600'>Welcome to WaveTalk</h1>
       <input
         type="text"
         name="fullName"
         onChange={handleInputChange}
         placeholder="Full name"
         value={data.fullName}
-        className="border p-2 focus:outline-none focus:border-lime-600 focus:border-2  rounded-md"
+        className="border p-2 text-sky-700 focus:outline-none focus:border-sky-600 focus:border-2  rounded-md"
       />
       <input
         type="text"
@@ -36,7 +38,7 @@ const Signup = () => {
         onChange={handleInputChange}
         placeholder="User name"
         value={data.userName}
-        className="border p-2 focus:outline-none focus:border-lime-600 focus:border-2  rounded-md"
+        className="border p-2 focus:outline-none text-sky-700 focus:border-sky-600 focus:border-2  rounded-md"
       />
       <input
         type="password"
@@ -44,9 +46,9 @@ const Signup = () => {
         onChange={handleInputChange}
         placeholder="Password"
         value={data.password}
-        className="border p-2 focus:outline-none focus:border-lime-600 focus:border-2  rounded-md"
+        className="border p-2 focus:outline-none text-sky-700 focus:border-sky-600 focus:border-2  rounded-md"
       />
-      <div className='flex gap-2'>
+      <div className='flex gap-2 text-sky-700'>
         <input
           type="radio"
           name="gender"
@@ -68,12 +70,12 @@ const Signup = () => {
       </div>
       <button
         onClick={handleClick}
-        className="bg-lime-600 text-white p-2 rounded-md hover:bg-lime-800 focus:outline-none focus:ring focus:border-lime-600"
+        className="bg-sky-600 text-white p-2 rounded-md hover:bg-sky-800 focus:outline-none focus:ring focus:border-sky-600"
       >
         Signup
       </button>
-      <Link to="/login" className="text-lime-900 hover:underline focus:outline-none focus:ring focus:border-lime-600">
-        Already have an account???
+      <Link to="/login" className="text-sky-900 hover:underline focus:outline-none">
+        Back to the Waves: Log In Here???
       </Link>
     </div>
   );

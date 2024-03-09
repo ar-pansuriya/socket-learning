@@ -17,7 +17,7 @@ module.exports.addGroup = async (req, res) => {
                 memberIds.push(memberUser._id);
             }
         }
-        let profilePic = `https://avatar.iran.liara.run/username?username=${name[0]}+A`
+        let profilePic = `${name[0].toUpperCase()}A`
         let createdAt = new Date();
         let list = await Group.insertMany({ name, member: memberIds, owner: userId._id, profilePic, createdAt });
         let group = await Group.findOne({ _id: list[0]._id }).populate({ path: 'member', select: 'userName' });
@@ -62,10 +62,10 @@ module.exports.deleteGroup = async (req, res) => {
 
     try {
         let { id } = req.params
-       let res= await Group.findById({_id:id}).select("_id")
-       console.log(res._id);
+        let res = await Group.findById({ _id: id }).select("_id")
+        console.log(res._id);
         await GroupMessage.deleteMany({ groupId: id });
-        await Group.findByIdAndDelete({ _id:id });
+        await Group.findByIdAndDelete({ _id: id });
         res.send({ "message": 'done' })
     } catch (error) {
         console.error(error.message)

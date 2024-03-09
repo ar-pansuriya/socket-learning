@@ -1,6 +1,12 @@
 import React, { useRef, useEffect } from 'react';
+import { useSelector } from 'react-redux'
 
-const ScrollContainer = ({ children, direction, height }) => {
+
+
+export default function ShowMember({ direction }) {
+
+
+    const selectedGroup = useSelector(state => state.Chats.selectGdata);
     const containerRef = useRef();
     const easeInOutCubic = (t) => (t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2);
 
@@ -15,19 +21,15 @@ const ScrollContainer = ({ children, direction, height }) => {
 
         const handleScroll = (e) => {
             if (container) {
-                const scrollStep = 3; // Adjust as needed
+                const scrollStep = 2; // Adjust as needed
 
                 // Calculate the target scroll position
                 let targetScroll;
 
-                if (e.deltaY !== undefined) {
-                    // Mouse wheel event
-                    targetScroll = direction === 'row' ? container.scrollLeft + e.deltaY * scrollStep : container.scrollTop + e.deltaY * scrollStep;
-                } else if (e.touches && e.touches.length === 1) {
-                    // Touch event
-                    const touch = e.touches[0];
-                    const delta = direction === 'row' ? touch.clientX - touch.startX : touch.clientY - touch.startY;
-                    targetScroll = direction === 'row' ? container.scrollLeft + delta * scrollStep : container.scrollTop + delta * scrollStep;
+                if (direction === 'row') {
+                    targetScroll = container.scrollLeft + e.deltaY * scrollStep;
+                } else {
+                    targetScroll = container.scrollTop + e.deltaY * scrollStep;
                 }
 
                 // Smooth scroll using requestAnimationFrame
@@ -39,19 +41,11 @@ const ScrollContainer = ({ children, direction, height }) => {
 
         if (container) {
             container.addEventListener('wheel', handleScroll);
-            container.addEventListener('touchstart', (e) => {
-                const touch = e.touches[0];
-                touch.startX = touch.clientX;
-                touch.startY = touch.clientY;
-            });
-            container.addEventListener('touchmove', handleScroll, { passive: false });
         }
 
         return () => {
             if (container) {
                 container.removeEventListener('wheel', handleScroll);
-                container.removeEventListener('touchstart', handleScroll);
-                container.removeEventListener('touchmove', handleScroll);
             }
         };
     }, [containerRef, direction]);
@@ -80,13 +74,22 @@ const ScrollContainer = ({ children, direction, height }) => {
     };
 
     return (
-        <div
-            className={`flex flex-${direction} ${height} overflow-${direction === 'row' ? 'x' : 'y'}-hidden mb-2 gap-4 items-center justify-start cursor-pointer`}
-            ref={containerRef}
-        >
-            {children}
-        </div>
-    );
-};
-
-export default ScrollContainer;
+        <>
+            <div ref={containerRef} className='absolute z-20 right-0 w-64 h-48 flex flex-wrap gap-3 items-center justify-center p-2 bg-sky-200 shadow-xl rounded top-16 overflow-hidden'>
+                {selectedGroup.member.map((user, index) => (
+                    <div
+                        key={index}
+                        className={`cursor-pointer flex flex-col justify-center items-center`}
+                    >
+                        <img
+                            src={user.profilePic}
+                            alt="User Profile"
+                            className="w-12 h-12 border-2 border-sky-900 rounded-full"
+                        />
+                        <span className='text-sky-700'>{user.userName}</span>
+                    </div>
+                ))}
+            </div>
+        </>
+    )
+}

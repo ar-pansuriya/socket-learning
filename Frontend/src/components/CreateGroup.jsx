@@ -27,10 +27,10 @@ export default function CreateGroup({ isGslected }) {
         socket.on('groupError', async ({ groupId }) => {
             toast.error('Sorry he or she is no more')
             toast.warn('please refresh the page')
-          let res  = await axios.delete(`/api/group/${groupId}`);
-          if(res.data.message==='done'){
-            getGroups();
-          }
+            let res = await axios.delete(`/api/group/${groupId}`);
+            if (res.data.message === 'done') {
+                getGroups();
+            }
         })
 
     }, [socket]);
@@ -88,7 +88,7 @@ export default function CreateGroup({ isGslected }) {
     };
 
     useEffect(() => {
-       
+
 
         if (isRender) {
             getGroups();
@@ -101,19 +101,19 @@ export default function CreateGroup({ isGslected }) {
                 <div className="cursor-pointer relative select-none">
                     <h2
                         onClick={() => setPopupOpen((prev) => !prev)}
-                        className="font-semibold p-2 rounded bg-lime-100 flex items-center"
+                        className="font-semibold p-2 rounded border-sky-900 shadow-sm bg-sky-100 border flex items-center"
                     >
                         Create Group <span className="ml-2">+</span>
                     </h2>
-                    <h2 className="text-white font-bold m-1">Group List</h2>
+                    <h2 className="text-sky-700 font-bold m-1">Group List</h2>
                     {isPopupOpen && (
                         <div
                             onClick={(e) => e.stopPropagation()}
-                            className="bg-lime-100 p-4 mt-2 flex flex-col gap-2 absolute cursor-default left-0 top-10 w-64 shadow-lg rounded-md"
+                            className="bg-sky-100 p-4 mt-2 flex flex-col gap-2 absolute cursor-default left-0 top-10 w-64 border border-sky-900 rounded-md"
                         >
                             <div className="flex justify-between">
-                                <label htmlFor="groupName">Group Name:</label>
-                                <label htmlFor="member" className="bg-lime-900 text-white w-10 text-center rounded-full">
+                                <label className='text-sky-700'>Group Name:</label>
+                                <label className="bg-sky-900 text-white w-10 text-center rounded-full">
                                     {member.length}
                                 </label>
                             </div>
@@ -122,33 +122,33 @@ export default function CreateGroup({ isGslected }) {
                                 id="groupName"
                                 value={groupName}
                                 onChange={(e) => setGroupName(e.target.value)}
-                                className="border border-lime-900 bg-lime-100 p-2 rounded-md w-full"
+                                className="border p-2 bg-sky-100 border-sky-900 focus:outline-none rounded-md font-medium text-sky-700"
                                 onClick={(e) => e.stopPropagation()}
                             />
-                            <HorizontalScrollContainer>
+                            <HorizontalScrollContainer direction={"row"}>
                                 {userlist.map((user, index) => (
                                     <div
                                         key={index}
                                         onClick={() => handleAddUserGroup(user)}
-                                        className={`mx-2 cursor-pointer flex flex-col ${member.includes(user.userName) ? 'opacity-30' : ''
+                                        className={`cursor-pointer flex flex-col ${member.includes(user.userName) ? 'opacity-30' : ''
                                             } justify-center items-center`}
                                     >
                                         <img
                                             src={user.profilePic}
                                             alt="User Profile"
-                                            className="w-10 h-10 border border-lime-900 rounded-full mr-2"
+                                            className="w-12 h-12 border-2 border-sky-900 rounded-full"
                                         />
-                                        <span>{user.userName}</span>
+                                        <span className='text-sky-700'>{user.userName}</span>
                                     </div>
                                 ))}
                             </HorizontalScrollContainer>
-                            <button onClick={handleCreateGroup} className="bg-lime-900 text-white p-2 rounded-md">
+                            <button onClick={handleCreateGroup} className="bg-sky-900 text-white p-2 rounded-md">
                                 Create Group
                             </button>
                         </div>
                     )}
                 </div>
-                <HorizontalScrollContainer>
+                <HorizontalScrollContainer direction={'row'}>
                     {groups.map((group, index) => {
                         const isMemberOrOwner =
                             group.member.some((member) => member.userName === currentUser.userName) ||
@@ -161,12 +161,9 @@ export default function CreateGroup({ isGslected }) {
                                     onClick={() => selectGroup(group)}
                                     className="mx-2 w-fit items-center flex flex-col"
                                 >
-                                    <img
-                                        src={group.profilePic}
-                                        alt="Group"
-                                        className="w-12 h-12 border border-lime-900 rounded-full"
-                                    />
-                                    <span className="text-white text-sm font-semibold">{group.name}</span>
+                                    <h1 className="w-12 h-12 bg-sky-100 shadow-lg text-lg flex items-center justify-center text-sky-700 rounded"
+                                    >{group.profilePic}</h1>
+                                    <span className="text-sky-700 font-medium text-lg">{group.name}</span>
                                 </div>
                             );
                         } else {
