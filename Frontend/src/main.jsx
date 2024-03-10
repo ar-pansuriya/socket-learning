@@ -13,7 +13,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   // <React.StrictMode>
   <BrowserRouter>
     <Provider store={store}>
-    <ToastContainer/>
+      <ToastContainer theme={'colored'} />
       <App />
     </Provider>
   </BrowserRouter>,

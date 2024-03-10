@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const Signup = () => {
   const [data, setData] = useState({ fullName: '', userName: '', password: '', gender: '' });
   const navigate = useNavigate();
-
+  const [isload, setisload] = useState(false);
   const handleInputChange = (e) => {
     setData({
       ...data,
@@ -14,10 +15,16 @@ const Signup = () => {
   };
 
   const handleClick = async () => {
+    setisload(true)
     let res = await axios.post('api/auth/signup', data);
-    console.log(res.data);
+    setisload(false)
     setData({ fullName: '', userName: '', password: '', gender: '' });
-    navigate('/login');
+    if (res.data.message === 'account created') {
+      navigate('/login');
+    } else {
+      toast.info(res.data.message)
+    }
+
   };
 
   return (

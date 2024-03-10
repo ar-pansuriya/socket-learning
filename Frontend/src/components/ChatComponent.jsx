@@ -22,6 +22,7 @@ const ChatComponent = () => {
   const navigate = useNavigate();
   const [usersList, setusersList] = useState([]);
   const [currentUser, setcurrentUser] = useState({});
+  console.log(currentUser);
   const [touser, settouser] = useState("");
   const [chatMessages, setChatMessages] = useState([]);
   const [message, setMessage] = useState('');
@@ -227,7 +228,6 @@ const ChatComponent = () => {
             </button>
           </div>
         </div>
-
 
         <img onTouchStart={() => setisLeftBarOpen(!isLeftbarOpen)} onClick={() => setisLeftBarOpen(!isLeftbarOpen)} className="w-6 h-6 cursor-pointer hover:w-8 hover:h-8 -right-0 absolute left-0 top-1/2 z-40  my-auto" src="arrow.png" alt=""
           style={{ transform: `translateX(${isLeftbarOpen ? '0' : '290'}px) translateY(-50%) rotate(${isLeftbarOpen ? '180' : '0'}deg) translateZ(0px)`, transition: '0.5s' }} />

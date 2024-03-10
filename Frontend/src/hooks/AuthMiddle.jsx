@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const useAuth = () => {
   const navigate = useNavigate();
@@ -15,11 +16,12 @@ const useAuth = () => {
           let res = await axios.get('/api/auth/refresh');
           // If the new token is not present, navigate to /login
           if (res.data.accessToken !== 'success') {
-            navigate('/login',{replace:true});
+            toast.info('Please Login To Enter In WaveTalk');
+            navigate('/login', { replace: true });
           }
         } catch (error) {
           console.error('Error during token refresh:', error);
-          navigate('/login',{replace:true});
+          navigate('/login', { replace: true });
         }
       }
     };
