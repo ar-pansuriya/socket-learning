@@ -69,9 +69,6 @@ const Login = () => {
         <Link to="/signup" className="text-sky-900 underline mb-2">
           Join the WaveTalk Community???
         </Link>
-        <Link to="/profile" className="text-sky-900 hover:underline">
-          Enter WaveTalk
-        </Link>
       </div>
     </div>
   );
