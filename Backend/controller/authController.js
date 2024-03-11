@@ -32,7 +32,7 @@ module.exports.PostLogin = async (req, res) => {
         if (!match) return res.send({ message: 'Password Is Invalid' });
         const accessToken = jwt.sign({ userName, password }, process.env.SECRET_KEY, { expiresIn: '10min' });
         const refreshToken = jwt.sign({ userName, password }, process.env.SECRET_KEY, { expiresIn: '2d' });
-        res.cookie('LoginUser', userName, { httpOnly: false, maxAge: 2 * 24 * 60 * 60 * 1000 });
+        res.cookie('LoginUser', userName, {sameSite:'none',secure:true, httpOnly: false, maxAge: 2 * 24 * 60 * 60 * 1000 });
         res.cookie('jwtrefresh', refreshToken, { httpOnly: true, maxAge: 2 * 24 * 60 * 60 * 1000 });
         res.cookie('jwtaccess', accessToken, { httpOnly: false, maxAge: 10 * 60 * 1000 });
         res.send({ message: 'login successful' });

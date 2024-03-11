@@ -45,7 +45,9 @@ export default function GroupChats() {
     if (selectedGroup.name && message) {
       let sender = currentUser.userName;
       let Id = selectedGroup._id;
-      let res = await axios.post('/api/group/message', { message, sender, Id });
+      let res = await axios.post('/api/group/message', { message, sender, Id },{
+        withCredentials: true, // Include credentials in the request
+      });
       if (res.data.message === 'done') {
         socket.emit('sendGroupMessage', { text: message, Gdata: res.data.group, sender: { userName: currentUser.userName } });
         // setChatMessages([...chatMessages, { text: message, sender: { userName: currentUser.userName }, groupId: selectedGroup._id }]);
@@ -55,7 +57,9 @@ export default function GroupChats() {
   };
 
   const fetchGroupMessages = async () => {
-    let res = await axios.get(`/api/group/message/${selectedGroup._id}`);
+    let res = await axios.get(`/api/group/message/${selectedGroup._id}`,{
+      withCredentials: true, // Include credentials in the request
+    });
     dispatch(addgroupData(res.data));
     // return setChatMessages(res.data);
   }

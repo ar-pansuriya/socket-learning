@@ -16,7 +16,9 @@ const Signup = () => {
 
   const handleClick = async () => {
     setisload(true)
-    let res = await axios.post('api/auth/signup', data);
+    let res = await axios.post('api/auth/signup', data,{
+      withCredentials: true, // Include credentials in the request
+    });
     setisload(false)
     setData({ fullName: '', userName: '', password: '', gender: '' });
     if (res.data.message === 'account created') {

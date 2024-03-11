@@ -74,7 +74,9 @@ const ChatComponent = () => {
 
     // fetch users and set current loginuser
     const fetchusers = async () => {
-      let res = await axios.get("/api/userslist");
+      let res = await axios.get("/api/userslist",{
+        withCredentials: true, // Include credentials in the request
+      });
       let adduser = res.data.filter((v) => v.userName !== LoginUser);
       setusersList(adduser);
       setcurrentUser(res.data.filter((v) => v.userName === LoginUser)[0]);
@@ -101,7 +103,9 @@ const ChatComponent = () => {
       let to = touser.userName;
       let time = new Date();
       let sender = currentUser.userName;
-      let res = await axios.post('/api/message', { message, sender, to, createdAt: formated(time) });
+      let res = await axios.post('/api/message', { message, sender, to, createdAt: formated(time) },{
+        withCredentials: true, // Include credentials in the request
+      });
       if (res.data.message === 'done') {
         setChatMessages([...chatMessages, { text: message, sender, to, createdAt: formated(time) }]);
         socket.emit('personal-chat', { message, sender, to, createdAt: formated(time) });
@@ -113,7 +117,9 @@ const ChatComponent = () => {
 
   //logout account and send api request to remove access and refhresh token form cookies
   const handleLogout = async () => {
-    let res = await axios.get("/api/auth/logout");
+    let res = await axios.get("/api/auth/logout",{
+      withCredentials: true, // Include credentials in the request
+    });
     if (res.data.message === "success") {
       socket.emit('userdisconnect', { user: currentUser.userName });
       navigate("/login", { replace: true });
@@ -143,7 +149,6 @@ const ChatComponent = () => {
   };
 
   async function fetchChats(v) {
-    console.log('asasa');
     let res = await axios.get(`/api/message?user=${v ? v.userName : touser.userName}&page=${page}`, { withCredentials: true });
     console.log(res.data);
     return res.data

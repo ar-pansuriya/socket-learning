@@ -27,7 +27,9 @@ export default function CreateGroup({ isGslected }) {
         socket.on('groupError', async ({ groupId }) => {
             toast.error('Sorry he or she is no more')
             toast.warn('please refresh the page')
-            let res = await axios.delete(`/api/group/${groupId}`);
+            let res = await axios.delete(`/api/group/${groupId}`,{
+                withCredentials: true, // Include credentials in the request
+              });
             if (res.data.message === 'done') {
                 getGroups();
             }
@@ -54,7 +56,9 @@ export default function CreateGroup({ isGslected }) {
         if (groupName.trim() !== '' && member.length >= 1) {
             const newGroup = { name: groupName, member, owner: currentUser.userName };
             try {
-                const res = await axios.post('/api/group', newGroup);
+                const res = await axios.post('/api/group', newGroup,{
+                    withCredentials: true, // Include credentials in the request
+                  });
                 if (res.data.message) {
                     setGroups((prevGroups) => [...prevGroups, newGroup]);
                     socket.emit('createGroup', { data: res.data.group });
@@ -79,7 +83,9 @@ export default function CreateGroup({ isGslected }) {
 
     const getGroups = async () => {
         try {
-            const res = await axios.get('/api/group');
+            const res = await axios.get('/api/group',{
+                withCredentials: true, // Include credentials in the request
+              });
             setGroups(res.data);
             setIsRender(false);
         } catch (error) {

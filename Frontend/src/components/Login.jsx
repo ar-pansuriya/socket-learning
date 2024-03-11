@@ -7,7 +7,6 @@ import '../App.css'
 
 const Login = () => {
 
-  const socket = useMemo(() => io('http://localhost:5000'), []);
   const Navigate = useNavigate();
   const [data, setData] = useState({ userName: '', password: '' });
   const [isload, setisload] = useState(false);
@@ -22,7 +21,9 @@ const Login = () => {
   const handleClick = async () => {
     if (data.userName && data.password) {
       setisload(true);
-      let res = await axios.post('api/auth/login', data);
+      let res = await axios.post('api/auth/login', data,{
+        withCredentials: true, // Include credentials in the request
+      });
       setData({ userName: '', password: '' });
       setisload(false);
       if (res.data.message === 'login successful') {

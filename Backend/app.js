@@ -5,9 +5,13 @@ const cookieParser = require('cookie-parser');
 const { app, server, express } = require('./socket.io/socket');
 const chatRoute = require('./routes/chatRoute');
 const groupRoute = require('./routes/groupRoute');
-const path = require('path')
 
-app.use(cors());
+app.use(cors({
+    origin: 'http://yourfrontenddomain.com', // Replace with your frontend domain
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true, // Allow cookies and other credentials
+    exposedHeaders: ['set-cookie'], // Expose "set-cookie" header to the client
+  }));
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
